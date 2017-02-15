@@ -56,6 +56,10 @@ systemctl start rabbitmq-server
 systemctl status rabbitmq-server
 systemctl stop rabbitmq-server
 ```
-
+## Limit number of message in queue 
+```
+rabbitmqctl set_policy limit_celeryev_queues "^celeryev\." '{"max-length":10}' --apply-to queues
+```
+(Limit queue with start with `celeryev` maximum 10 messages)
 
 
