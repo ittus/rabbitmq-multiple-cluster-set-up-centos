@@ -5,7 +5,14 @@ Guide for setting up high available rabbitmq cluster
 
 
 # Config hosts file
+Edit /etc/hosts on both master and slave1 server:
 
+```
+10.0.0.1 master_name master_name
+10.0.0.2 slave1_name slave1_name
+```
+
+Note that master_name and slave1_name is hostname (Can run `hostname -s` to check)
 
 # Config firewalld
 Do it on master and all slave clusters:
@@ -20,6 +27,11 @@ firewall-cmd --reload
  
 
 # Set up cluster
+
+## Cluster policy
+```
+rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+```
 
 # Extra
 ## Remove all message in queue
