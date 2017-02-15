@@ -3,6 +3,31 @@ Guide for setting up high available rabbitmq cluster
 
 # Set up rabbitmq
 
+Set up rabbitmq on both master and slave1 server
+```
+yum -y update
+wget http://www.rabbitmq.com/releases/rabbitmq-server/v3.2.2/rabbitmq-server-3.2.2-1.noarch.rpm
+rpm --import http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
+yum install rabbitmq-server-3.2.2-1.noarch.rpm
+rabbitmq-plugins enable rabbitmq_management
+```
+
+## Start rabbitmq
+```
+rabbitmq-server -detached
+rabbitmqctl status
+```
+
+Run rabbitmqctl cluster_status and you will receive:
+```
+Cluster status of node rabbit@localhost ...
+[{nodes,[{disc,[rabbit@master]}]},
+ {running_nodes,[rabbit@master]},
+ {cluster_name,<<"rabbit@master">>},
+ {partitions,[]},
+ {alarms,[{rabbit@master,[]}]}]
+ ```
+Note `rabbit@master` name, need to use it in below section.
 
 # Config hosts file
 Edit /etc/hosts on both master and slave1 server:
@@ -27,6 +52,34 @@ firewall-cmd --reload
  
 
 # Set up cluster
+## Sync cookie
+On master:
+```
+[master]# cat /var/lib/rabbitmq/.erlang.cookie 
+XNZYNUHKGUCVDTGZXJKX
+```
+
+Copy `DQRRLCTUGODCRFNPIABC` value to slave1:
+```
+[slave1]# echo -n "DQRRLCTUGODCRFNPIABC" > /var/lib/rabbitmq/.erlang.cookie
+```
+
+## Config cluster
+On master:
+
+```
+rabbitmqctl stop_app
+rabbitmqctl reset
+rabbitmqctl start_app
+```
+On slave1:
+```
+rabbitmqctl stop_app
+rabbitmqctl reset
+rabbitmqctl join_cluster rabbit@master
+rabbitmqctl start_app
+```
+
 
 ## Cluster policy
 ```
