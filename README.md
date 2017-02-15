@@ -21,4 +21,41 @@ firewall-cmd --reload
 
 # Set up cluster
 
+# Extra
+## Remove all message in queue
+```
+rabbitmqadmin list queues name | awk '{print $2}' | xargs -I qn rabbitmqadmin delete queue name=qn
+```
+
+## Monitor by systemctl
+
+```
+chkconfig rabbitmq-server on
+```
+Edit /etc/systemd/system/rabbitmq-server.service
+
+```
+[Unit]
+Description=Rabbitmq service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/home/root/
+ExecStart=/usr/sbin/rabbitmq-server
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Now we can monitor by
+```
+systemctl start rabbitmq-server
+systemctl status rabbitmq-server
+systemctl stop rabbitmq-server
+```
+
+
 
