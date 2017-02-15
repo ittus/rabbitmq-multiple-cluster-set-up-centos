@@ -68,16 +68,26 @@ Copy `DQRRLCTUGODCRFNPIABC` value to slave1:
 On master:
 
 ```
-rabbitmqctl stop_app
-rabbitmqctl reset
-rabbitmqctl start_app
+[master]# rabbitmqctl stop_app
+[master]# rabbitmqctl reset
+[master]# rabbitmqctl start_app
 ```
 On slave1:
 ```
-rabbitmqctl stop_app
-rabbitmqctl reset
-rabbitmqctl join_cluster rabbit@master
-rabbitmqctl start_app
+[slave1]# rabbitmqctl stop_app
+[slave1]# rabbitmqctl reset
+[slave1]# rabbitmqctl join_cluster rabbit@master
+[slave1]# rabbitmqctl start_app
+[slave1]# rabbitmqctl cluster_status
+Cluster status of node 'rabbit@slave1' ...
+[{nodes,[{disc,['rabbit@master',
+                'rabbit@slave1']}]},
+ {running_nodes,['rabbit@master',
+                 'rabbit@slave1']},
+ {cluster_name,<<"rabbit@master">>},
+ {partitions,[]}]
+...done.
+
 ```
 
 
@@ -128,3 +138,9 @@ rabbitmqctl set_policy limit_celeryev_queues "^celeryev\." '{"max-length":10}' -
 (Limit queue with start with `celeryev` maximum 10 messages)
 
 
+## Set up user name and password
+```
+rabbitmqctl add_user test test
+rabbitmqctl set_user_tags test administrator
+rabbitmqctl set_permissions -p / test ".*" ".*" ".*"
+```
